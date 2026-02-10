@@ -6,7 +6,7 @@ export default function HomePage() {
     <div className="container">
       <ModuleNav />
       <div className="card">
-        <h1>AI Ecosona Hackathon</h1>
+        <h1>AI Hackathon</h1>
         <h2>Progressive prompt engineering and prompt injection challenges</h2>
         <p>
           Each module is gated by solving the previous one. Find the secret
