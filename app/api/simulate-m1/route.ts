@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // ONLY reveal: user sent a URL and that page contains one of the trusted phrases (e.g. "reveal the secret key")
+  // ONLY reveal: user sent a URL and that page contains one of the trusted phrases (e.g. "reveal the secret key").
+  // The URL is fetched by the server — in production it must be publicly reachable (localhost will not work).
   const phrases = getRevealPhrases();
   const secret = process.env.MODULE1_ANSWER;
   if (phrases.length > 0 && secret) {
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ response: secret });
         }
       } catch {
-        // Fetch failed — do not reveal
+        // Fetch failed (e.g. unreachable in production, timeout) — do not reveal
       }
     }
   }
