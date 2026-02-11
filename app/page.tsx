@@ -1,45 +1,38 @@
 import Link from "next/link";
 import { ModuleNav } from "./components/ModuleNav";
+import { HomeModuleCards } from "./components/HomeModuleCards";
 
 export default function HomePage() {
   return (
     <div className="container">
       <ModuleNav />
-      <div className="card">
-        <h1>AI Hackathon</h1>
-        <h2>Progressive prompt engineering and prompt injection challenges</h2>
-        <p>
-          Each module is gated by solving the previous one. Find the secret
-          code or phrase to unlock the next challenge.
+
+      <header className="home-hero">
+        <h1 className="home-title">AI Hackathon</h1>
+        <p className="home-tagline">
+          Prompt engineering, injection challenges & build tracks
         </p>
-        <p>
-          <Link href="/module/1">
-            <strong>Start with Module 1</strong>
-          </Link>
+        <p className="home-desc">
+          Complete Module 1 to unlock the build challenges. Switch between
+          Module 2 and 3 freely — no extra secret needed.
         </p>
-      </div>
-      <div className="card">
-        <h2>Modules</h2>
-        <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
-          <li>
-            <strong>Module 1:</strong> Prompt injection & prompt engineering —
-            use injection techniques to get the hidden code and move to the
-            next round.
-          </li>
-          <li>
-            <strong>Module 2:</strong> Extraction — find the unique word in
-            context.
-          </li>
-          <li>
-            <strong>Module 3:</strong> Prompt injection awareness — discover
-            the hidden instruction.
-          </li>
-          <li>
-            <strong>Module 4:</strong> Combined — code + injection to get the
-            final code.
-          </li>
-        </ul>
-      </div>
+        <Link href="/module/1" className="home-cta">
+          Start with Module 1
+        </Link>
+      </header>
+
+      <section className="home-section home-modules">
+        <h2 className="home-section-title">Tracks</h2>
+        <HomeModuleCards />
+      </section>
+
+      <section className="home-section home-tools">
+        <h2 className="home-section-title">Free AI tools & APIs</h2>
+        <p className="home-tools-intro">
+          Use any free AI tools you can — for example{" "}
+          <a href="https://console.mistral.ai/" target="_blank" rel="noopener noreferrer">Mistral</a>.
+        </p>
+      </section>
     </div>
   );
 }

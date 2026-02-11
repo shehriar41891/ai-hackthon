@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type Progress = { m1: boolean; m2: boolean; m3: boolean; m4: boolean };
+type Progress = { m1: boolean; m2: boolean; m3: boolean };
 
 export function ModuleNav() {
   const [progress, setProgress] = useState<Progress | null>(null);
@@ -12,7 +12,7 @@ export function ModuleNav() {
     fetch("/api/progress")
       .then((r) => r.json())
       .then(setProgress)
-      .catch(() => setProgress({ m1: true, m2: false, m3: false, m4: false }));
+      .catch(() => setProgress({ m1: false, m2: false, m3: false }));
   };
 
   useEffect(() => {
@@ -21,27 +21,26 @@ export function ModuleNav() {
     return () => window.removeEventListener("ecosona-progress", fetchProgress);
   }, []);
 
-  if (!progress) return null;
-
   const modules = [
-    { id: 1, label: "Module 1", unlocked: progress.m1 },
-    { id: 2, label: "Module 2", unlocked: progress.m2 },
-    { id: 3, label: "Module 3", unlocked: progress.m3 },
-    { id: 4, label: "Module 4", unlocked: progress.m4 },
+    { id: 1, label: "Module 1", unlocked: true },
+    { id: 2, label: "Module 2", unlocked: progress !== null && progress.m1 },
+    { id: 3, label: "Module 3", unlocked: progress !== null && progress.m1 },
   ];
 
   return (
     <nav className="nav">
       <Link href="/">Home</Link>
-      {modules.map((m) => (
-        <Link
-          key={m.id}
-          href={`/module/${m.id}`}
-          className={m.unlocked ? "unlocked" : "locked"}
-        >
-          {m.label}
-        </Link>
-      ))}
+      {modules.map((m) =>
+        m.unlocked ? (
+          <Link key={m.id} href={`/module/${m.id}`} className="unlocked">
+            {m.label}
+          </Link>
+        ) : (
+          <span key={m.id} className="nav-locked" aria-disabled="true">
+            {m.label}
+          </span>
+        )
+      )}
     </nav>
   );
 }

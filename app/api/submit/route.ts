@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const validModules = ["1", "2", "3", "4"];
+  const validModules = ["1"];
   if (!validModules.includes(moduleId)) {
     return NextResponse.json({ error: "Invalid module" }, { status: 400 });
   }
@@ -26,14 +26,10 @@ export async function POST(request: NextRequest) {
   const progress = parseProgressCookie(cookieValue);
 
   const currentKey = `m${moduleId}` as keyof typeof progress;
-  const prevKey =
-    moduleId === "1"
-      ? null
-      : (`m${Number(moduleId) - 1}` as keyof typeof progress);
-  if (moduleId !== "1" && prevKey && !progress[prevKey]) {
+  if (moduleId !== "1") {
     return NextResponse.json(
-      { error: "Complete the previous module first" },
-      { status: 403 }
+      { error: "Only Module 1 requires a secret to unlock." },
+      { status: 400 }
     );
   }
 
@@ -48,8 +44,8 @@ export async function POST(request: NextRequest) {
 
   const res = NextResponse.json({
     correct: true,
-    nextModule: next === "done" ? null : Number(next.replace("m", "")),
-    complete: next === "done",
+    nextModule: 2,
+    complete: false,
   });
   res.cookies.set("ecosona_progress", serialized, progressCookieOptions());
   return res;

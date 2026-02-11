@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { VulnerableChat } from "./VulnerableChat";
 import { Module1PromptBox } from "./Module1PromptBox";
-import { Module2Paragraph } from "./Module2Paragraph";
+import { Module2Challenge } from "./Module2Challenge";
+import { Module3Challenge } from "./Module3Challenge";
 
-type Progress = { m1: boolean; m2: boolean; m3: boolean; m4: boolean };
+type Progress = { m1: boolean; m2: boolean; m3: boolean };
 
 type Props = {
   moduleId: string;
@@ -15,6 +15,7 @@ type Props = {
   description: string;
   inputLabel: string;
   hasChat: boolean;
+  hint?: string;
 };
 
 export function ModuleContent({
@@ -24,8 +25,10 @@ export function ModuleContent({
   description,
   inputLabel,
   hasChat,
+  hint,
 }: Props) {
   const [progress, setProgress] = useState<Progress | null>(null);
+  const [hintOpen, setHintOpen] = useState(false);
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState<{
     type: "error" | "success";
@@ -39,12 +42,12 @@ export function ModuleContent({
     fetch("/api/progress")
       .then((r) => r.json())
       .then(setProgress)
-      .catch(() => setProgress({ m1: true, m2: false, m3: false, m4: false }));
+      .catch(() => setProgress({ m1: false, m2: false, m3: false }));
   }, [message]);
 
   const num = Number(moduleId);
-  const prevKey = num > 1 ? (`m${num - 1}` as keyof Progress) : null;
-  const canAccess = !progress || num === 1 || (prevKey && progress[prevKey]);
+  const canAccess =
+    num === 1 || (num >= 2 && progress !== null && progress.m1);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,28 +104,69 @@ export function ModuleContent({
     <div className="card">
       <h1>{title}</h1>
       <h2>{subtitle}</h2>
-      <p>{description}</p>
+      {moduleId === "2" ? (
+        <Module2Challenge />
+      ) : moduleId === "3" ? (
+        <Module3Challenge />
+      ) : (
+        <p>{description}</p>
+      )}
+
+      {hint && (
+        <div style={{ marginBottom: "1rem" }}>
+          <button
+            type="button"
+            onClick={() => setHintOpen((o) => !o)}
+            style={{
+              padding: "0.4rem 0.75rem",
+              fontSize: "0.9rem",
+              background: hintOpen ? "#30363d" : "#21262d",
+              border: "1px solid #30363d",
+              borderRadius: "6px",
+              color: "#f3f4f6",
+              cursor: "pointer",
+            }}
+          >
+            {hintOpen ? "Hide hint" : "Hint"}
+          </button>
+          {hintOpen && (
+            <div
+              style={{
+                marginTop: "0.5rem",
+                padding: "0.75rem 1rem",
+                background: "#0d1117",
+                border: "1px solid #30363d",
+                borderRadius: "6px",
+                fontSize: "0.9rem",
+                color: "#8b949e",
+              }}
+            >
+              {hint}
+            </div>
+          )}
+        </div>
+      )}
 
       {moduleId === "1" && <Module1PromptBox />}
-      {moduleId === "2" && <Module2Paragraph />}
-      {hasChat && <VulnerableChat moduleId={moduleId} />}
 
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="answer" style={{ display: "block", marginBottom: "0.5rem" }}>
-          {inputLabel}
-        </label>
-        <input
-          id="answer"
-          type="text"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Enter your answer"
-          disabled={loading}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Checking…" : "Submit"}
-        </button>
-      </form>
+      {moduleId === "1" && (
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="answer" style={{ display: "block", marginBottom: "0.5rem" }}>
+            {inputLabel}
+          </label>
+          <input
+            id="answer"
+            type="text"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            placeholder="Enter your answer"
+            disabled={loading}
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? "Checking…" : "Submit"}
+          </button>
+        </form>
+      )}
 
       {message && (
         <div className={`message ${message.type}`}>{message.text}</div>
